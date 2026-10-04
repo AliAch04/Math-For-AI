@@ -1,0 +1,163 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage[margin=2.5cm]{geometry}
+
+\title{Polynomial Interpolation: Lagrange, Newton and Hermite}
+\date{}
+
+\begin{document}
+\maketitle
+
+%--------------------------------------------------
+\section*{Question 1 :}
+
+We select two functions with $n = 3$ 
+
+
+  \[
+    f(x) = \sin(x), \quad x \in [-1, 1].
+  \]
+
+  \[
+    g(x) = \frac{1}{1 + 2x^2}, \quad x \in [-1, 1].
+  \]
+
+
+%--------------------------------------------------
+\section*{Question 2:}
+
+Given $n = 3$, we have $\{x_0, x_1, x_2, x_3\}$
+
+%--------------------------------------------------
+\subsection*{1. Lagrange Interpolation }
+
+\[
+  P_3(x) = \sum_{k=0}^{3} f(x_k)\, L_k(x)
+\]
+where :
+\[
+  L_k(x) = \prod_{\substack{j=0 \\ j \neq k}}^{3} \frac{x - x_j}{x_k - x_j}.
+\]
+
+\begin{align*}
+  P_3(x) ={}& f(x_0)\,\frac{(x-x_1)(x-x_2)(x-x_3)}{(x_0-x_1)(x_0-x_2)(x_0-x_3)}
+           + f(x_1)\,\frac{(x-x_0)(x-x_2)(x-x_3)}{(x_1-x_0)(x_1-x_2)(x_1-x_3)} \\
+           &+ f(x_2)\,\frac{(x-x_0)(x-x_1)(x-x_3)}{(x_2-x_0)(x_2-x_1)(x_2-x_3)}
+           + f(x_3)\,\frac{(x-x_0)(x-x_1)(x-x_2)}{(x_3-x_0)(x_3-x_1)(x_3-x_2)}.
+\end{align*}
+
+%--------------------------------------------------
+\subsection*{2. Newton Interpolation }
+
+\[
+  P_3(x) = a_0 + a_1(x - x_0) + a_2(x - x_0)(x - x_1) + a_3(x - x_0)(x - x_1)(x - x_2),
+\]
+Using divided differences $f[x_0, \dots, x_k]$.
+
+\[
+  a_0 = f[x_0] = f(x_0).
+\]
+
+\[
+  a_1 = f[x_0, x_1] = \frac{f(x_1) - f(x_0)}{x_1 - x_0}.
+\]
+
+\[
+  a_2 = f[x_0, x_1, x_2]
+      = \frac{f[x_1, x_2] - f[x_0, x_1]}{x_2 - x_0}
+      = \frac{\dfrac{f(x_2) - f(x_1)}{x_2 - x_1} - a_1}{x_2 - x_0}.
+\]
+
+\[
+  a_3 = f[x_0, x_1, x_2, x_3]
+      = \frac{f[x_1, x_2, x_3] - f[x_0, x_1, x_2]}{x_3 - x_0}.
+\]
+Expanding $f[x_1, x_2, x_3]$ :
+\[
+  f[x_1, x_2, x_3]
+  = \frac{f[x_2, x_3] - f[x_1, x_2]}{x_3 - x_1}
+  = \frac{\dfrac{f(x_3) - f(x_2)}{x_3 - x_2} - \dfrac{f(x_2) - f(x_1)}{x_2 - x_1}}{x_3 - x_1}.
+\]
+
+\[
+  a_3 = \frac{\dfrac{\dfrac{f(x_3) - f(x_2)}{x_3 - x_2} - \dfrac{f(x_2) - f(x_1)}{x_2 - x_1}}{x_3 - x_1} - a_2}{x_3 - x_0}.
+\]
+
+%--------------------------------------------------
+\subsection*{3. Hermite Interpolation}
+For $n = 3$, the Hermite polynomial $P_7(x)$ where $2n + 1 = 7$:
+\[
+  P_7(x) = \sum_{k=0}^{3} f(x_k)\, h_k(x) + \sum_{k=0}^{3} f'(x_k)\, \bar{h}_k(x),
+\]
+with 
+\[
+  h_k(x) = \bigl[\, 1 - 2(x - x_k)\, L_k'(x_k) \,\bigr] \bigl(L_k(x)\bigr)^2,
+  \qquad
+  \bar{h}_k(x) = (x - x_k)\bigl(L_k(x)\bigr)^2.
+\]
+ 
+\paragraph{For $k=0$.}
+\begin{align*}
+  L_0(x) &= \frac{(x-x_1)(x-x_2)(x-x_3)}{(x_0-x_1)(x_0-x_2)(x_0-x_3)}, \\[4pt]
+  L_0'(x) &= \frac{(x-x_1)(x-x_2) + (x-x_1)(x-x_3) + (x-x_2)(x-x_3)}{(x_0-x_1)(x_0-x_2)(x_0-x_3)}, \\[4pt]
+  L_0'(x_0) &= \frac{(x_0-x_1)(x_0-x_2) + (x_0-x_1)(x_0-x_3) + (x_0-x_2)(x_0-x_3)}{(x_0-x_1)(x_0-x_2)(x_0-x_3)}, \\[4pt]
+  \bigl(L_0(x)\bigr)^2 &= \frac{\bigl[(x-x_1)(x-x_2)(x-x_3)\bigr]^2}{\bigl[(x_0-x_1)(x_0-x_2)(x_0-x_3)\bigr]^2}, \\[4pt]
+  h_0(x) &= \bigl[\,1 - 2(x-x_0)\,L_0'(x_0)\,\bigr]\bigl(L_0(x)\bigr)^2, \\[4pt]
+  \bar{h}_0(x) &= (x-x_0)\bigl(L_0(x)\bigr)^2.
+\end{align*}
+ 
+\paragraph{For $k=1$.}
+\begin{align*}
+  L_1(x) &= \frac{(x-x_0)(x-x_2)(x-x_3)}{(x_1-x_0)(x_1-x_2)(x_1-x_3)}, \\[4pt]
+  L_1'(x) &= \frac{(x-x_0)(x-x_2) + (x-x_0)(x-x_3) + (x-x_2)(x-x_3)}{(x_1-x_0)(x_1-x_2)(x_1-x_3)}, \\[4pt]
+  L_1'(x_1) &= \frac{(x_1-x_0)(x_1-x_2) + (x_1-x_0)(x_1-x_3) + (x_1-x_2)(x_1-x_3)}{(x_1-x_0)(x_1-x_2)(x_1-x_3)}, \\[4pt]
+  \bigl(L_1(x)\bigr)^2 &= \frac{\bigl[(x-x_0)(x-x_2)(x-x_3)\bigr]^2}{\bigl[(x_1-x_0)(x_1-x_2)(x_1-x_3)\bigr]^2}, \\[4pt]
+  h_1(x) &= \bigl[\,1 - 2(x-x_1)\,L_1'(x_1)\,\bigr]\bigl(L_1(x)\bigr)^2, \\[4pt]
+  \bar{h}_1(x) &= (x-x_1)\bigl(L_1(x)\bigr)^2.
+\end{align*}
+ 
+\paragraph{For $k=2$.}
+\begin{align*}
+  L_2(x) &= \frac{(x-x_0)(x-x_1)(x-x_3)}{(x_2-x_0)(x_2-x_1)(x_2-x_3)}, \\[4pt]
+  L_2'(x) &= \frac{(x-x_0)(x-x_1) + (x-x_0)(x-x_3) + (x-x_1)(x-x_3)}{(x_2-x_0)(x_2-x_1)(x_2-x_3)}, \\[4pt]
+  L_2'(x_2) &= \frac{(x_2-x_0)(x_2-x_1) + (x_2-x_0)(x_2-x_3) + (x_2-x_1)(x_2-x_3)}{(x_2-x_0)(x_2-x_1)(x_2-x_3)}, \\[4pt]
+  \bigl(L_2(x)\bigr)^2 &= \frac{\bigl[(x-x_0)(x-x_1)(x-x_3)\bigr]^2}{\bigl[(x_2-x_0)(x_2-x_1)(x_2-x_3)\bigr]^2}, \\[4pt]
+  h_2(x) &= \bigl[\,1 - 2(x-x_2)\,L_2'(x_2)\,\bigr]\bigl(L_2(x)\bigr)^2, \\[4pt]
+  \bar{h}_2(x) &= (x-x_2)\bigl(L_2(x)\bigr)^2.
+\end{align*}
+ 
+\paragraph{For $k=3$.}
+\begin{align*}
+  L_3(x) &= \frac{(x-x_0)(x-x_1)(x-x_2)}{(x_3-x_0)(x_3-x_1)(x_3-x_2)}, \\[4pt]
+  L_3'(x) &= \frac{(x-x_0)(x-x_1) + (x-x_0)(x-x_2) + (x-x_1)(x-x_2)}{(x_3-x_0)(x_3-x_1)(x_3-x_2)}, \\[4pt]
+  L_3'(x_3) &= \frac{(x_3-x_0)(x_3-x_1) + (x_3-x_0)(x_3-x_2) + (x_3-x_1)(x_3-x_2)}{(x_3-x_0)(x_3-x_1)(x_3-x_2)}, \\[4pt]
+  \bigl(L_3(x)\bigr)^2 &= \frac{\bigl[(x-x_0)(x-x_1)(x-x_2)\bigr]^2}{\bigl[(x_3-x_0)(x_3-x_1)(x_3-x_2)\bigr]^2}, \\[4pt]
+  h_3(x) &= \bigl[\,1 - 2(x-x_3)\,L_3'(x_3)\,\bigr]\bigl(L_3(x)\bigr)^2, \\[4pt]
+  \bar{h}_3(x) &= (x-x_3)\bigl(L_3(x)\bigr)^2.
+\end{align*}
+ 
+
+\[
+  P_7(x)=\sum_{k=0}^{3}\Bigl\{f(x_k)\,\bigl[\,1-2(x-x_k)L_k'(x_k)\,\bigr]+f'(x_k)(x-x_k)\Bigr\}\bigl(L_k(x)\bigr)^2
+\]
+
+{\footnotesize
+\begin{align*}
+  P_7(x) ={}& \Biggl\{ f(x_0)\left[\, 1 - 2(x-x_0)\,\frac{(x_0-x_1)(x_0-x_2) + (x_0-x_1)(x_0-x_3) + (x_0-x_2)(x_0-x_3)}{(x_0-x_1)(x_0-x_2)(x_0-x_3)} \right] \\
+  &\qquad + f'(x_0)\,(x-x_0) \Biggr\} \\
+  &\qquad\times \frac{\bigl[(x-x_1)(x-x_2)(x-x_3)\bigr]^2}{\bigl[(x_0-x_1)(x_0-x_2)(x_0-x_3)\bigr]^2} \\[12pt]
+  &+ \Biggl\{ f(x_1)\left[\, 1 - 2(x-x_1)\,\frac{(x_1-x_0)(x_1-x_2) + (x_1-x_0)(x_1-x_3) + (x_1-x_2)(x_1-x_3)}{(x_1-x_0)(x_1-x_2)(x_1-x_3)} \right] \\
+  &\qquad + f'(x_1)\,(x-x_1) \Biggr\} \\
+  &\qquad\times \frac{\bigl[(x-x_0)(x-x_2)(x-x_3)\bigr]^2}{\bigl[(x_1-x_0)(x_1-x_2)(x_1-x_3)\bigr]^2} \\[12pt]
+  &+ \Biggl\{ f(x_2)\left[\, 1 - 2(x-x_2)\,\frac{(x_2-x_0)(x_2-x_1) + (x_2-x_0)(x_2-x_3) + (x_2-x_1)(x_2-x_3)}{(x_2-x_0)(x_2-x_1)(x_2-x_3)} \right] \\
+  &\qquad + f'(x_2)\,(x-x_2) \Biggr\} \\
+  &\qquad\times \frac{\bigl[(x-x_0)(x-x_1)(x-x_3)\bigr]^2}{\bigl[(x_2-x_0)(x_2-x_1)(x_2-x_3)\bigr]^2} \\[12pt]
+  &+ \Biggl\{ f(x_3)\left[\, 1 - 2(x-x_3)\,\frac{(x_3-x_0)(x_3-x_1) + (x_3-x_0)(x_3-x_2) + (x_3-x_1)(x_3-x_2)}{(x_3-x_0)(x_3-x_1)(x_3-x_2)} \right] \\
+  &\qquad + f'(x_3)\,(x-x_3) \Biggr\} \\
+  &\qquad\times \frac{\bigl[(x-x_0)(x-x_1)(x-x_2)\bigr]^2}{\bigl[(x_3-x_0)(x_3-x_1)(x_3-x_2)\bigr]^2}.
+\end{align*}
+}
+ 
+\end{document}
