@@ -337,7 +337,7 @@ $n$ & Lagrange & Newton & Hermite \\
  
 \subsection*{2. The sharper function $g(x)=\dfrac{1}{1+25x^2}$ (Runge example)}
  
-Since $\frac{1}{1+2x^2}$ does not exhibit large oscillations on $[-1,1]$, we use the same type of function with a larger coefficient. Its poles at $\pm i/5$ are very close to the interval, which triggers Runge's phenomenon.
+Since $\frac{1}{1+2x^2}$ does not exhibit large oscillations, we use the same type of function with a larger coefficient which triggers Runge's phenomenon.
  
 \begin{table}[h!]
 \centering
@@ -351,22 +351,19 @@ $n$ & Lagrange & Newton & Hermite \\
 20 & $5.982\times10^{1}$  & $5.982\times10^{1}$  & $3.729\times10^{3}$ \\
 \hline
 \end{tabular}
-\caption{Maximum error for $g(x)=\frac{1}{1+25x^2}$ as $n$ increases.}
 \end{table}
  
 \begin{figure}[h!]
 \centering
 \includegraphics[width=0.9\textwidth]{fig_g25_lagrange.png}
-\caption{Lagrange (= Newton) interpolation of $\frac{1}{1+25x^2}$ for $n=5,10,15,20$.}
 \end{figure}
  
 \begin{figure}[h!]
 \centering
 \includegraphics[width=0.9\textwidth]{fig_g25_hermite.png}
-\caption{Hermite interpolation of $\frac{1}{1+25x^2}$ for $n=5,10,15,20$.}
 \end{figure}
  
-\paragraph{Comments.} Here increasing $n$ makes the approximation \emph{worse}. The interpolant fits well near the centre but develops large oscillations near $x=\pm1$ whose amplitude grows with $n$ (maximum error about $0.43$ for $n=5$ and about $60$ for $n=20$ with Lagrange). This is Runge's phenomenon: with equally spaced nodes, the interpolation error behaves like $\omega(x)=\prod_k (x-x_k)$, which is much larger near the endpoints than at the centre, and the nearby poles of $g$ make the derivatives grow too fast for the error to go to zero. Newton gives exactly the same curve as Lagrange. Hermite, of degree $2n+1$, is even more unstable (error about $3.7\times10^{3}$ for $n=20$), so using derivative information does not cure the problem when the nodes are equally spaced.
+\paragraph{Comments.} Here increasing $n$ makes the approximation \emph{worse}. The interpolant develops large oscillations near $x=\pm1$ whose amplitude grows with $n$ (maximum error about $0.43$ for $n=5$ and about $60$ for $n=20$ with Lagrange). 
  
 \paragraph{Conclusion.} Raising the degree does not guarantee a better approximation. For smooth functions with distant singularities ($\sin x$, $\frac{1}{1+2x^2}$) the error decreases as $n$ grows, but for functions with nearby poles ($\frac{1}{1+25x^2}$) equally spaced interpolation diverges near the endpoints. A standard remedy is to use Chebyshev nodes, which cluster near the endpoints, or piecewise (spline) interpolation, instead of one high-degree polynomial.
  
