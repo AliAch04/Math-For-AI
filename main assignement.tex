@@ -2,7 +2,21 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath,amssymb}
+\usepackage{listings}
 \usepackage[margin=2.5cm]{geometry}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{teal},
+  breaklines=true,
+  showstringspaces=false
+}
 
 \title{Polynomial Interpolation: Lagrange, Newton and Hermite}
 \date{}
@@ -159,5 +173,141 @@ with
   &\qquad\times \frac{\bigl[(x-x_0)(x-x_1)(x-x_2)\bigr]^2}{\bigl[(x_3-x_0)(x_3-x_1)(x_3-x_2)\bigr]^2}.
 \end{align*}
 }
+%--------------------------------------------------
+\section*{Question 3: Python Implementation}
+ 
+The three methods were implemented in Python with recursive functions and applied to $f(x)=\sin(x)$ and $g(x)=\frac{1}{1+2x^2}$ on $[-1,1]$ with $n=3$ (4 equally spaced nodes). For each function the maximum error $\max_x |f(x)-P(x)|$ is computed on a grid of 500 points.
+ 
+\subsection*{Code}
+ 
+\begin{lstlisting}
+import numpy as np
+import matplotlib.pyplot as plt
+ 
+ 
+def f(x):
+    return np.sin(x)
+ 
+def df(x):
+    return np.cos(x)
+ 
+def g(x):
+    return 1 / (1 + 2 * x**2)
+ 
+def dg(x):
+    return -4 * x / (1 + 2 * x**2)**2
+ 
+ 
+# L_k(x) computed recursively over j
+def L(k, j, xn, x):
+    if j == len(xn):
+        return 1
+    if j == k:
+        return L(k, j + 1, xn, x)
+    return (x - xn[j]) / (xn[k] - xn[j]) * L(k, j + 1, xn, x)
+ 
+# L_k'(x_k) computed recursively over j
+def dL(k, j, xn):
+    if j == len(xn):
+        return 0
+    if j == k:
+        return dL(k, j + 1, xn)
+    return 1 / (xn[k] - xn[j]) + dL(k, j + 1, xn)
+ 
+ 
+def lagrange(xn, yn, x, k=0):
+    if k == len(xn):
+        return 0
+    return yn[k] * L(k, 0, xn, x) + lagrange(xn, yn, x, k + 1)
+ 
+ 
+# divided difference f[x_0, ..., x_k]
+def divided_diff(xn, yn):
+    if len(xn) == 1:
+        return yn[0]
+    return (divided_diff(xn[1:], yn[1:]) - divided_diff(xn[:-1], yn[:-1])) / (xn[-1] - xn[0])
+ 
+def newton(xn, yn, x, k=0, prod=1):
+    if k == len(xn):
+        return 0
+    a = divided_diff(xn[:k + 1], yn[:k + 1])
+    return a * prod + newton(xn, yn, x, k + 1, prod * (x - xn[k]))
+ 
+ 
+def hermite(xn, yn, dyn, x, k=0):
+    if k == len(xn):
+        return 0
+    Lk = L(k, 0, xn, x)
+    h = (1 - 2 * (x - xn[k]) * dL(k, 0, xn)) * Lk**2
+    hbar = (x - xn[k]) * Lk**2
+    return yn[k] * h + dyn[k] * hbar + hermite(xn, yn, dyn, x, k + 1)
+ 
+ 
+def run(func, dfunc, a, b, n, title):
+    xn = np.linspace(a, b, n)
+    yn = func(xn)
+    dyn = dfunc(xn)
+ 
+    x = np.linspace(a, b, 500)
+    y = func(x)
+ 
+    yl = lagrange(xn, yn, x)
+    yn_ = newton(xn, yn, x)
+    yh = hermite(xn, yn, dyn, x)
+ 
+    print("Errors for", title)
+    print("Lagrange:", np.max(np.abs(y - yl)))
+    print("Newton:  ", np.max(np.abs(y - yn_)))
+    print("Hermite: ", np.max(np.abs(y - yh)))
+    print()
+ 
+    plt.figure(figsize=(10, 5))
+    plt.plot(x, y, 'k--', label='f(x)', linewidth=2)
+    plt.plot(x, yl, label='Lagrange')
+    plt.plot(x, yn_, ':', label='Newton')
+    plt.plot(x, yh, label='Hermite')
+    plt.plot(xn, yn, 'ro', label='Nodes')
+    plt.title(title)
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+ 
+ 
+run(f, df, -1, 1, 4, "f(x) = sin(x)")
+run(g, dg, -1, 1, 4, "g(x) = 1/(1 + 2x^2)")
+\end{lstlisting}
+ 
+\subsection*{Results}
+ 
+\begin{table}[h!]
+\centering
+\begin{tabular}{lccc}
+\hline
+Function & Lagrange & Newton & Hermite \\
+\hline
+$f(x)=\sin(x)$ & $1.218\times10^{-3}$ & $1.218\times10^{-3}$ & $7.957\times10^{-8}$ \\
+$g(x)=\frac{1}{1+2x^2}$ & $0.1212$ & $0.1212$ & $0.0225$ \\
+\hline
+\end{tabular}
+\end{table}
+ 
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.85\textwidth]{fig_sin.png}
+\caption{Interpolation of $f(x)=\sin(x)$.}
+\end{figure}
+ 
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.85\textwidth]{fig_runge.png}
+\caption{Interpolation of $g(x)=\frac{1}{1+2x^2}$.}
+\end{figure}
+ 
+\subsection*{Comments}
+ 
+Lagrange and Newton produce the same polynomial (the interpolating polynomial of degree $3$ is unique), so their errors coincide up to rounding. Hermite uses the derivative values as well, so it has degree $7$ and is clearly more accurate on both functions. The error is larger for $g$ than for $\sin$, since $g$ has poles near the real axis at $\pm i/\sqrt{2}$.
  
 \end{document}
+ 
