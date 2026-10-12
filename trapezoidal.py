@@ -74,3 +74,8 @@ def main():
 
 if __name__ == "__main__":
   main()
+be
+import time
+t = time.time()
+trapezoidal("sin(x)", 0, math.pi, 100000)
+print(f"Time for n=100000: {time.time() - t:.3f} s")
